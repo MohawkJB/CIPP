@@ -17,6 +17,8 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
+          # PAT needs contents, workflows, and actions write permissions.
+          token: ${{ secrets.UPSTREAM_SYNC_TOKEN || github.token }}
 
       - name: Rebase local commits onto upstream
         id: rebase
@@ -39,5 +41,5 @@ jobs:
       - name: Trigger deploy
         if: steps.rebase.outputs.pushed == 'true'
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.UPSTREAM_SYNC_TOKEN || github.token }}
         run: gh workflow run cipp-workflow.yml --ref main -R "$GITHUB_REPOSITORY"
